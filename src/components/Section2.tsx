@@ -15,6 +15,11 @@ export const Section2: React.FC<SectionProps> = ({ data, updateData, errors }) =
         updateData({ [e.target.name]: e.target.value });
     };
 
+    // Auto-capitalize first letter of each word (Title Case)
+    const toTitleCase = (value: string) => {
+        return value.replace(/\b\w/g, char => char.toUpperCase());
+    };
+
     const eduOptions = [
         { value: 'No formal education', label: 'No formal education' },
         { value: 'High School', label: 'High School' },
@@ -55,7 +60,7 @@ export const Section2: React.FC<SectionProps> = ({ data, updateData, errors }) =
                     label="9a. Father's Occupation"
                     name="fatherOccupation"
                     value={data.fatherOccupation}
-                    onChange={handleChange}
+                    onChange={(e) => updateData({ fatherOccupation: toTitleCase(e.target.value) })}
                     placeholder="e.g. Farmer, Teacher"
                     error={errors.fatherOccupation}
                 />
@@ -63,7 +68,7 @@ export const Section2: React.FC<SectionProps> = ({ data, updateData, errors }) =
                     label="9b. Mother's Occupation"
                     name="motherOccupation"
                     value={data.motherOccupation}
-                    onChange={handleChange}
+                    onChange={(e) => updateData({ motherOccupation: toTitleCase(e.target.value) })}
                     placeholder="e.g. Trader, Nurse"
                     error={errors.motherOccupation}
                 />
@@ -87,7 +92,7 @@ export const Section2: React.FC<SectionProps> = ({ data, updateData, errors }) =
                         label="10c. If yes, what type?"
                         name="familyBusinessType"
                         value={data.familyBusinessType}
-                        onChange={handleChange}
+                        onChange={(e) => updateData({ familyBusinessType: toTitleCase(e.target.value) })}
                         placeholder="e.g. Retail shop"
                         error={errors.familyBusinessType}
                     />

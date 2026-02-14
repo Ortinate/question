@@ -48,12 +48,20 @@
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.animate-slide-in {
-  animation: slideIn 0.4s ease-out forwards;
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
 }
 
 
@@ -253,12 +261,15 @@ textarea {
   font-size: 1rem;
 }
 
+/* Enhanced Focus State */
 .input:focus,
 .select:focus,
 .textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.15);
+  /* Softer, larger glow */
+  transition: all 0.2s ease-in-out;
 }
 
 .input-error,
@@ -452,7 +463,30 @@ textarea {
   background-color: var(--primary);
   height: 100%;
   border-radius: 9999px;
-  transition: width 0.3s ease-in-out;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Navigation */
@@ -796,6 +830,57 @@ textarea {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+/* Mobile Responsiveness Overrides */
+@media (max-width: 640px) {
+
+  /* Increase touch targets for inputs and buttons */
+  .input,
+  .select,
+  .btn,
+  .likert-option {
+    padding: 1rem;
+    /* Larger touch area */
+    font-size: 1rem;
+    /* Prevent zoom on iOS */
+  }
+
+  /* Compact spacing for small screens */
+  .section-container,
+  .card,
+  .form-card,
+  .subsection-card {
+    padding: 1rem;
+    /* Reduce from 2rem */
+    gap: 1rem;
+  }
+
+  .subsection-description {
+    margin-bottom: 1rem;
+  }
+
+  /* Dashboard Adjustments */
+  .dashboard-actions {
+    flex-wrap: wrap;
+    /* Allow buttons to wrap */
+    width: 100%;
+  }
+
+  .dashboard-actions .btn {
+    flex: 1 1 auto;
+    /* Grow to fill space */
+  }
+
+  .stat-card,
+  .chart-card {
+    padding: 1rem;
+  }
+
+  /* Ensure logo text fits */
+  .university-name {
+    font-size: 1rem;
+  }
 }
 
 .search-container {

@@ -15,6 +15,11 @@ export const Section4: React.FC<SectionProps> = ({ data, updateData, errors }) =
         updateData({ [e.target.name]: e.target.value });
     };
 
+    // Capitalize first letter of the first word (Sentence Case)
+    const toSentenceCase = (value: string) => {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    };
+
     return (
         <div className="section-container">
             <div>
@@ -42,7 +47,7 @@ export const Section4: React.FC<SectionProps> = ({ data, updateData, errors }) =
                         label="Please specify:"
                         name="careerGoalOther"
                         value={data.careerGoalOther}
-                        onChange={handleChange}
+                        onChange={(e) => updateData({ careerGoalOther: toSentenceCase(e.target.value) })}
                         error={errors.careerGoalOther}
                     />
                 )}

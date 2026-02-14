@@ -28,15 +28,32 @@ export const FacultyBarChart: React.FC<ChartProps> = ({ data }) => {
     return (
         <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-15} textAnchor="end" height={60} />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip
-                        cursor={{ fill: 'transparent' }}
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                    <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 11, fill: '#64748b' }}
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
                     />
-                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    <YAxis
+                        allowDecimals={false}
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                        axisLine={false}
+                        tickLine={false}
+                    />
+                    <Tooltip
+                        cursor={{ fill: '#f1f5f9' }}
+                        contentStyle={{
+                            borderRadius: '0.75rem',
+                            border: '1px solid #e2e8f0',
+                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                            padding: '0.75rem'
+                        }}
+                    />
+                    <Bar dataKey="count" radius={[6, 6, 0, 0]} barSize={50}>
                         {chartData.map((_entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}

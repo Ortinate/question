@@ -128,7 +128,7 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                             </div>
                             <div className="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">
                                 <span className="text-xs text-gray-500 uppercase font-bold">Current GPA</span>
-                                <div className={`text-2xl font-bold ${parseFloat(data.gpa) >= 3.5 ? 'text-green-600' : parseFloat(data.gpa) >= 2.5 ? 'text-blue-600' : 'text-orange-600'}`}>
+                                <div className={`text-2xl font-bold ${parseFloat(data.gpa) >= 4.0 ? 'text-green-600' : parseFloat(data.gpa) >= 3.0 ? 'text-blue-600' : parseFloat(data.gpa) >= 2.0 ? 'text-orange-600' : 'text-gray-600'}`}>
                                     {data.gpa}
                                 </div>
                             </div>
@@ -142,6 +142,7 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                             <div className="break-inside-avoid">
                                 <SectionHeader icon={User} title="Academic Information" />
                                 <div className="modal-section-grid cols-3 mt-4">
+                                    <Field label="Index Number" value={data.indexNumber} />
                                     <Field label="Age" value={data.age} />
                                     <Field label="Gender" value={data.gender} />
                                     <Field label="Degree Program" value={data.degreeProgram} />

@@ -10,8 +10,9 @@ interface SectionProps {
 }
 
 export const Section7: React.FC<SectionProps> = ({ data, updateData, errors }) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        updateData({ [e.target.name]: e.target.value });
+    // Capitalize first letter of the first word (Sentence Case)
+    const toSentenceCase = (value: string) => {
+        return value.charAt(0).toUpperCase() + value.slice(1);
     };
 
     return (
@@ -38,7 +39,7 @@ export const Section7: React.FC<SectionProps> = ({ data, updateData, errors }) =
                         label="Please specify:"
                         name="employmentBarrierOther"
                         value={data.employmentBarrierOther}
-                        onChange={handleChange}
+                        onChange={(e) => updateData({ employmentBarrierOther: toSentenceCase(e.target.value) })}
                         error={errors.employmentBarrierOther}
                     />
                 )}
@@ -67,7 +68,7 @@ export const Section7: React.FC<SectionProps> = ({ data, updateData, errors }) =
                         label="Please specify:"
                         name="employmentFactorOther"
                         value={data.employmentFactorOther}
-                        onChange={handleChange}
+                        onChange={(e) => updateData({ employmentFactorOther: toSentenceCase(e.target.value) })}
                         error={errors.employmentFactorOther}
                     />
                 )}

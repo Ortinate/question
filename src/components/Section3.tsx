@@ -25,6 +25,10 @@ export const Section3: React.FC<SectionProps> = ({ data, updateData, errors }) =
         updateData({ [e.target.name]: e.target.value });
     };
 
+    // Auto-capitalize first letter of each word (Title Case)
+    const toTitleCase = (value: string) => {
+        return value.replace(/\b\w/g, char => char.toUpperCase());
+    };
 
     return (
         <div className="section-container">
@@ -118,7 +122,7 @@ export const Section3: React.FC<SectionProps> = ({ data, updateData, errors }) =
                         label="Please list:"
                         name="certificationsList"
                         value={data.certificationsList}
-                        onChange={handleChange}
+                        onChange={(e) => updateData({ certificationsList: toTitleCase(e.target.value) })}
                         placeholder="e.g. AWS Certified Solutions Architect"
                         error={errors.certificationsList}
                     />

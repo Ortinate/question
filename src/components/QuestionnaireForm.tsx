@@ -9,12 +9,13 @@ import { Section4 } from './Section4';
 import { Section5 } from './Section5';
 import { Section6 } from './Section6';
 import { Section7 } from './Section7';
-import { ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle, Loader2 } from 'lucide-react';
 
 export const QuestionnaireForm: React.FC = () => {
     const [data, setData] = useState<QuestionnaireData>(initialData);
     const [currentSection, setCurrentSection] = useState(1);
     const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -36,13 +37,21 @@ export const QuestionnaireForm: React.FC = () => {
 
         if (section === 1) {
             if (!data.name.trim()) newErrors.name = 'Name is required';
+            if (!data.indexNumber.trim()) newErrors.indexNumber = 'Index Number is required';
             if (!data.age) newErrors.age = 'Age is required';
             if (!data.gender) newErrors.gender = 'Gender is required';
             if (!data.faculty) newErrors.faculty = 'Faculty is required';
             if (!data.department) newErrors.department = 'Department is required';
             if (!data.degreeProgram) newErrors.degreeProgram = 'Degree Program is required';
             if (!data.currentYear) newErrors.currentYear = 'Current Year is required';
-            if (!data.gpa) newErrors.gpa = 'GPA is required';
+            if (!data.gpa) {
+                newErrors.gpa = 'GPA is required';
+            } else {
+                const gpaVal = parseFloat(data.gpa);
+                if (isNaN(gpaVal) || gpaVal < 0 || gpaVal > 5.0) {
+                    newErrors.gpa = 'GPA must be between 0.0 and 5.0';
+                }
+            }
         }
 
         if (section === 2) {
@@ -140,32 +149,50 @@ export const QuestionnaireForm: React.FC = () => {
     const handleSubmit = async () => {
         if (!validateSection(currentSection)) return;
 
-
+        setIsSubmitting(true);
 
         try {
+            // Check for duplicates (by Index Number)
+            if (data.indexNumber) {
+                const { data: existing } = await supabase
+                    .from('questionnaire_responses')
+                    .select('id')
+                    .filter('data->>indexNumber', 'eq', data.indexNumber)
+                    .single();
+
+                if (existing) {
+                    alert(`A submission with Index Number "${data.indexNumber}" already exists.`);
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
+
             const { error } = await supabase
                 .from('questionnaire_responses')
                 .insert([{ data: data }]);
 
-            if (error) {
-                console.error('Error submitting to Supabase:', error);
-                // Fallback to local storage for demo if supabase fails (e.g. no credentials)
+            if (error) throw error;
+
+            setSubmitted(true);
+            window.scrollTo(0, 0);
+
+        } catch (err) {
+            console.error('Submission error:', err);
+
+            // Fallback for demo/local if supabase fails
+            try {
                 const existing = localStorage.getItem('questionnaire_submissions');
                 const submissions = existing ? JSON.parse(existing) : [];
                 submissions.push({ id: Date.now(), created_at: new Date().toISOString(), data });
                 localStorage.setItem('questionnaire_submissions', JSON.stringify(submissions));
+                setSubmitted(true);
+                window.scrollTo(0, 0);
+            } catch (localErr) {
+                alert('Failed to submit. Please try again.');
             }
-        } catch (err) {
-            console.error('Unexpected error:', err);
-            // Fallback
-            const existing = localStorage.getItem('questionnaire_submissions');
-            const submissions = existing ? JSON.parse(existing) : [];
-            submissions.push({ id: Date.now(), created_at: new Date().toISOString(), data });
-            localStorage.setItem('questionnaire_submissions', JSON.stringify(submissions));
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setSubmitted(true);
-        window.scrollTo(0, 0);
     };
 
     if (submitted) {
@@ -187,16 +214,22 @@ export const QuestionnaireForm: React.FC = () => {
     }
 
     const renderSection = () => {
-        switch (currentSection) {
-            case 1: return <Section1 data={data} updateData={updateData} errors={errors} />;
-            case 2: return <Section2 data={data} updateData={updateData} errors={errors} />;
-            case 3: return <Section3 data={data} updateData={updateData} errors={errors} />;
-            case 4: return <Section4 data={data} updateData={updateData} errors={errors} />;
-            case 5: return <Section5 data={data} updateData={updateData} errors={errors} />;
-            case 6: return <Section6 data={data} updateData={updateData} errors={errors} />;
-            case 7: return <Section7 data={data} updateData={updateData} errors={errors} />;
-            default: return null;
-        }
+        return (
+            <div key={currentSection} className="animate-slide-in-right">
+                {(() => {
+                    switch (currentSection) {
+                        case 1: return <Section1 data={data} updateData={updateData} errors={errors} />;
+                        case 2: return <Section2 data={data} updateData={updateData} errors={errors} />;
+                        case 3: return <Section3 data={data} updateData={updateData} errors={errors} />;
+                        case 4: return <Section4 data={data} updateData={updateData} errors={errors} />;
+                        case 5: return <Section5 data={data} updateData={updateData} errors={errors} />;
+                        case 6: return <Section6 data={data} updateData={updateData} errors={errors} />;
+                        case 7: return <Section7 data={data} updateData={updateData} errors={errors} />;
+                        default: return null;
+                    }
+                })()}
+            </div>
+        );
     };
 
     const progress = (currentSection / totalSections) * 100;
@@ -232,9 +265,19 @@ export const QuestionnaireForm: React.FC = () => {
                 <button
                     onClick={handleNext}
                     className="btn btn-primary"
+                    disabled={isSubmitting}
                 >
-                    {currentSection === totalSections ? 'Submit Survey' : 'Next Step'}
-                    {currentSection !== totalSections && <ChevronRight className="icon-sm" />}
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="icon-sm animate-spin mr-2" />
+                            Submitting...
+                        </>
+                    ) : (
+                        <>
+                            {currentSection === totalSections ? 'Submit Survey' : 'Next Step'}
+                            {currentSection !== totalSections && <ChevronRight className="icon-sm ml-2" />}
+                        </>
+                    )}
                 </button>
             </div>
         </div>

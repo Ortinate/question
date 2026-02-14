@@ -65,6 +65,7 @@ export const AdminDashboard: React.FC = () => {
     // Filter and Paginate
     const filteredSubmissions = submissions.filter(sub =>
         sub.data.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sub.data.indexNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sub.data.faculty.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -243,6 +244,7 @@ export const AdminDashboard: React.FC = () => {
                                 <tr>
                                     <th>Date</th>
                                     <th>Name</th>
+                                    <th>Index Number</th>
                                     <th>Faculty</th>
                                     <th>Dept</th>
                                     <th>Program</th>
@@ -259,13 +261,17 @@ export const AdminDashboard: React.FC = () => {
                                         <td className="font-semibold text-gray-900">
                                             {sub.data.name}
                                         </td>
+                                        <td className="font-mono text-xs text-gray-500">
+                                            {sub.data.indexNumber || '-'}
+                                        </td>
                                         <td>{sub.data.faculty}</td>
                                         <td>{sub.data.department}</td>
                                         <td>{sub.data.degreeProgram}</td>
                                         <td>
-                                            <span className={`status-badge ${parseFloat(sub.data.gpa) >= 3.5 ? 'bg-green-100 text-green-800 border border-green-200' :
-                                                    parseFloat(sub.data.gpa) >= 2.5 ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                                                        'bg-orange-100 text-orange-800 border border-orange-200'
+                                            <span className={`status-badge ${parseFloat(sub.data.gpa) >= 4.0 ? 'bg-green-100 text-green-800 border border-green-200' :
+                                                parseFloat(sub.data.gpa) >= 3.0 ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                                                    parseFloat(sub.data.gpa) >= 2.0 ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                                                        'bg-gray-100 text-gray-800 border border-gray-200'
                                                 }`}>
                                                 {sub.data.gpa}
                                             </span>
