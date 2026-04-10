@@ -142,7 +142,6 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                             <div className="break-inside-avoid">
                                 <SectionHeader icon={User} title="Academic Information" />
                                 <div className="modal-section-grid cols-3 mt-4">
-                                    <Field label="Index Number" value={data.indexNumber} />
                                     <Field label="Age" value={data.age} />
                                     <Field label="Gender" value={data.gender} />
                                     <Field label="Degree Program" value={data.degreeProgram} />

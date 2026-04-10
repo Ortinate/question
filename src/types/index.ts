@@ -1,7 +1,6 @@
 export interface QuestionnaireData {
     // Section 1: Demographic & Educational Background
     name: string;
-    indexNumber: string;
     age: string;
     gender: string;
     faculty: string;
@@ -67,7 +66,6 @@ export interface QuestionnaireData {
 
 export const initialData: QuestionnaireData = {
     name: '',
-    indexNumber: '',
     age: '',
     gender: '',
     faculty: '',

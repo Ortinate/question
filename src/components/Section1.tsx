@@ -38,18 +38,9 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
                 error={errors.name}
             />
 
-            <Input
-                label="2. Student Index Number"
-                name="indexNumber"
-                value={data.indexNumber}
-                onChange={(e) => updateData({ indexNumber: e.target.value.toUpperCase() })}
-                placeholder="e.g. 0123456789"
-                error={errors.indexNumber}
-            />
-
             <div className="form-grid">
                 <Input
-                    label="3. Age in years"
+                    label="2. Age in years"
                     name="age"
                     type="number"
                     value={data.age}
@@ -59,7 +50,7 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
                 />
 
                 <Select
-                    label="4. Gender"
+                    label="3. Gender"
                     name="gender"
                     value={data.gender}
                     onChange={handleChange}
@@ -74,7 +65,7 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
 
             <div className="form-grid">
                 <Input
-                    label="5. Faculty"
+                    label="4. Faculty"
                     name="faculty"
                     value={data.faculty}
                     onChange={(e) => updateData({ faculty: toTitleCase(e.target.value) })}
@@ -89,7 +80,7 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
                 </datalist>
 
                 <Input
-                    label="6. Department"
+                    label="5. Department"
                     name="department"
                     value={data.department}
                     onChange={(e) => updateData({ department: toTitleCase(e.target.value) })}
@@ -105,7 +96,7 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
             </div>
 
             <RadioGroup
-                label="7. Degree Program"
+                label="6. Degree Program"
                 name="degreeProgram"
                 value={data.degreeProgram}
                 onChange={(value) => updateData({ degreeProgram: value })}
@@ -122,7 +113,7 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
 
             <div className="form-grid">
                 <Select
-                    label="8. Current Year of Study"
+                    label="7. Current Year of Study"
                     name="currentYear"
                     value={data.currentYear}
                     onChange={handleChange}
@@ -136,7 +127,7 @@ export const Section1: React.FC<SectionProps> = ({ data, updateData, errors }) =
                 />
 
                 <Input
-                    label="9. Current GPA/Cumulative Grade"
+                    label="8. Current GPA/Cumulative Grade"
                     name="gpa"
                     value={data.gpa}
                     onChange={handleChange}

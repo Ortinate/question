@@ -37,7 +37,6 @@ export const QuestionnaireForm: React.FC = () => {
 
         if (section === 1) {
             if (!data.name.trim()) newErrors.name = 'Name is required';
-            if (!data.indexNumber.trim()) newErrors.indexNumber = 'Index Number is required';
             if (!data.age) newErrors.age = 'Age is required';
             if (!data.gender) newErrors.gender = 'Gender is required';
             if (!data.faculty) newErrors.faculty = 'Faculty is required';
@@ -152,16 +151,17 @@ export const QuestionnaireForm: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            // Check for duplicates (by Index Number)
-            if (data.indexNumber) {
+            // Duplicate Submission Prevention (by Name & Department)
+            if (data.name && data.department) {
                 const { data: existing } = await supabase
                     .from('questionnaire_responses')
                     .select('id')
-                    .filter('data->>indexNumber', 'eq', data.indexNumber)
-                    .single();
+                    .filter('data->>name', 'eq', data.name)
+                    .filter('data->>department', 'eq', data.department)
+                    .limit(1);
 
-                if (existing) {
-                    alert(`A submission with Index Number "${data.indexNumber}" already exists.`);
+                if (existing && existing.length > 0) {
+                    alert(`A submission for "${data.name}" in "${data.department}" already exists. Please avoid submitting duplicate responses.`);
                     setIsSubmitting(false);
                     return;
                 }

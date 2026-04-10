@@ -65,7 +65,6 @@ export const AdminDashboard: React.FC = () => {
     // Filter and Paginate
     const filteredSubmissions = submissions.filter(sub =>
         sub.data.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sub.data.indexNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sub.data.faculty.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -244,7 +243,6 @@ export const AdminDashboard: React.FC = () => {
                                 <tr>
                                     <th>Date</th>
                                     <th>Name</th>
-                                    <th>Index Number</th>
                                     <th>Faculty</th>
                                     <th>Dept</th>
                                     <th>Program</th>
@@ -260,9 +258,6 @@ export const AdminDashboard: React.FC = () => {
                                         </td>
                                         <td className="font-semibold text-gray-900">
                                             {sub.data.name}
-                                        </td>
-                                        <td className="font-mono text-xs text-gray-500">
-                                            {sub.data.indexNumber || '-'}
                                         </td>
                                         <td>{sub.data.faculty}</td>
                                         <td>{sub.data.department}</td>
