@@ -109,30 +109,103 @@ export const AdminDashboard: React.FC = () => {
         // Flatten the data for CSV
         const csvRows = [];
 
-        // Headers (dynamically based on first submission or key fields)
-        const headers = ['ID', 'Date', 'Name', 'Faculty', 'Department', 'Degree', 'GPA'];
-        csvRows.push(headers.join(','));
+        // Headers
+        const headers = [
+            'ID', 'Date Submitted',
+            'Student Name', 'Age', 'Gender', 'Faculty', 'Department', 'Degree Program', 'Year of Study', 'GPA',
+            'Father\'s Education', 'Mother\'s Education', 'Father\'s Occupation', 'Mother\'s Occupation', 'Family Business', 'Business Type', 'Self Employed (Family)', 'Financial Stability', 'Financial Support',
+            'Skill: Technical', 'Skill: Problem Solving', 'Skill: Communication', 'Skill: Teamwork', 'Skill: Digital Literacy', 'Skill: Project Management', 'Skill: Leadership',
+            'Internships Completed', 'Professional Certifications', 'Certification Details', 'Industry Trends Awareness',
+            'Primary Career Goal', 'Employer Preference', 'Expected Salary', 'Willingness to Relocate', 'Job Stability Importance',
+            'Entrepreneurial: Skills', 'Entrepreneurial: Opportunities', 'Entrepreneurial: Challenges', 'Entrepreneurial: Resources', 'Entrepreneurial: Risks',
+            'Career Services Usage', 'Professional Network', 'University Preparation',
+            'Primary Employment Barrier', 'Top Success Factor'
+        ];
+        csvRows.push(headers.map(h => `"${h}"`).join(','));
 
         submissions.forEach(sub => {
+            const escapeCsv = (str: string | undefined | null) => {
+                if (str === null || str === undefined || str.trim() === '') return '"-"'; // Clean empty state
+                // Remove newlines and carriage returns to prevent row breaking in spreadsheet software
+                const singleLineStr = String(str).replace(/[\r\n]+/g, ' ').trim();
+                // Replace double quotes with two double quotes to escape them in CSV
+                const escapedString = singleLineStr.replace(/"/g, '""');
+                return `"${escapedString}"`;
+            };
+
+            const data = sub.data;
             const row = [
                 sub.id,
-                new Date(sub.created_at).toLocaleDateString(),
-                `"${sub.data.name}"`, // Quote to handle commas
-                `"${sub.data.faculty}"`,
-                `"${sub.data.department}"`,
-                `"${sub.data.degreeProgram}"`,
-                sub.data.gpa
+                escapeCsv(new Date(sub.created_at).toLocaleString()),
+                escapeCsv(data.name),
+                escapeCsv(data.age),
+                escapeCsv(data.gender),
+                escapeCsv(data.faculty),
+                escapeCsv(data.department),
+                escapeCsv(data.degreeProgram),
+                escapeCsv(data.currentYear),
+                escapeCsv(data.gpa),
+
+                escapeCsv(data.fatherEducation),
+                escapeCsv(data.motherEducation),
+                escapeCsv(data.fatherOccupation),
+                escapeCsv(data.motherOccupation),
+                escapeCsv(data.familyBusiness),
+                escapeCsv(data.familyBusinessType),
+                escapeCsv(data.familySelfEmployed),
+                escapeCsv(data.familyFinancialStability),
+                escapeCsv(data.familyFinancialSupport),
+
+                escapeCsv(data.skills?.technical),
+                escapeCsv(data.skills?.problemSolving),
+                escapeCsv(data.skills?.communication),
+                escapeCsv(data.skills?.teamwork),
+                escapeCsv(data.skills?.digitalLiteracy),
+                escapeCsv(data.skills?.projectManagement),
+                escapeCsv(data.skills?.leadership),
+
+                escapeCsv(data.internships),
+                escapeCsv(data.certifications),
+                escapeCsv(data.certificationsList),
+                escapeCsv(data.industryTrends),
+
+                // Merge "Other" fields into the primary column for a cleaner spreadsheet
+                escapeCsv(data.careerGoal === 'Other' ? data.careerGoalOther : data.careerGoal),
+                escapeCsv(data.employerPreference),
+                escapeCsv(data.salaryRange),
+                escapeCsv(data.relocation),
+                escapeCsv(data.jobStability),
+
+                escapeCsv(data.entrepreneurship?.skills),
+                escapeCsv(data.entrepreneurship?.opportunities),
+                escapeCsv(data.entrepreneurship?.challenges),
+                escapeCsv(data.entrepreneurship?.resources),
+                escapeCsv(data.entrepreneurship?.risks),
+
+                escapeCsv(data.careerServices),
+                escapeCsv(data.professionalNetwork),
+                escapeCsv(data.universityPreparation),
+
+                escapeCsv(data.employmentBarrier === 'Other' ? data.employmentBarrierOther : data.employmentBarrier),
+                escapeCsv(data.employmentFactor === 'Other' ? data.employmentFactorOther : data.employmentFactor)
             ];
             csvRows.push(row.join(','));
         });
 
-        const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
-        const encodedUri = encodeURI(csvContent);
+        const csvContent = csvRows.join("\n");
+        // Add UTF-8 BOM for Excel compatibility
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
         const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
+        link.setAttribute("href", url);
         link.setAttribute("download", "questionnaire_submissions.csv");
         document.body.appendChild(link);
         link.click();
+        
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     return (
