@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, User, BookOpen, Award, Target, Lightbulb, Search, AlertCircle, Printer } from 'lucide-react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import type { QuestionnaireData } from '../types';
 
 interface ResponseDetailModalProps {

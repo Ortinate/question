@@ -65,7 +65,7 @@ export const CorrelationChart: React.FC<ChartProps> = ({ data }) => {
                     formatter={(value: any) => [`${value} GPA`, 'Average Score']}
                 />
                 <Bar dataKey="avgGpa" radius={[6, 6, 0, 0]}>
-                    {chartData.map((entry, index) => (
+                    {chartData.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                     ))}
                     <LabelList dataKey="avgGpa" position="top" fill="#4b5563" fontSize={11} fontWeight="bold" />
