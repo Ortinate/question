@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { QuestionnaireData } from '../types';
-import { Download, RefreshCw, LogOut, Search, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, RefreshCw, LogOut, Search, Trash2, ChevronLeft, ChevronRight, Star, ArrowUpDown } from 'lucide-react';
 import { ResponseDetailModal } from './ResponseDetailModal';
 import { FacultyBarChart } from './charts/FacultyBarChart';
 import { CareerIntentionsPieChart } from './charts/CareerIntentionsPieChart';
+import { TimelineChart } from './charts/TimelineChart';
+import { CorrelationChart } from './charts/CorrelationChart';
 
 
 
@@ -59,14 +61,79 @@ export const AdminDashboard: React.FC = () => {
 
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [facultyFilter, setFacultyFilter] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [sortField, setSortField] = useState<'date' | 'name' | 'gpa'>('date');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
+    const [flaggedIds, setFlaggedIds] = useState<number[]>(() => {
+        const saved = localStorage.getItem('admin_flagged_submissions');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const toggleFlag = (id: number) => {
+        setFlaggedIds(prev => {
+            const newFlags = prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id];
+            localStorage.setItem('admin_flagged_submissions', JSON.stringify(newFlags));
+            return newFlags;
+        });
+    };
+
+    const handleSort = (field: 'date' | 'name' | 'gpa') => {
+        if (sortField === field) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortOrder(field === 'name' ? 'asc' : 'desc');
+        }
+    };
+
+    // Extract unique faculties for the dropdown filter
+    const uniqueFaculties = Array.from(new Set(submissions.map(s => s.data.faculty))).filter(Boolean).sort();
+
     // Filter and Paginate
-    const filteredSubmissions = submissions.filter(sub =>
-        sub.data.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sub.data.faculty.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredSubmissions = submissions
+        .filter(sub => {
+            const subDate = new Date(sub.created_at);
+            const isAfterStart = !startDate || subDate >= new Date(startDate);
+            
+            // For endDate, we need to include the entire day, so we adjust to midnight of the next day
+            let isBeforeEnd = true;
+            if (endDate) {
+                const end = new Date(endDate);
+                end.setDate(end.getDate() + 1); // include the end date day
+                isBeforeEnd = subDate < end;
+            }
+
+            return (
+                isAfterStart &&
+                isBeforeEnd &&
+                (sub.data.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                sub.data.department.toLowerCase().includes(searchTerm.toLowerCase())) &&
+                (facultyFilter === '' || sub.data.faculty === facultyFilter)
+            );
+        })
+        .sort((a, b) => {
+            let valA: string | number, valB: string | number;
+            
+            if (sortField === 'name') {
+                valA = a.data.name.toLowerCase();
+                valB = b.data.name.toLowerCase();
+            } else if (sortField === 'gpa') {
+                valA = parseFloat(a.data.gpa) || 0;
+                valB = parseFloat(b.data.gpa) || 0;
+            } else {
+                valA = new Date(a.created_at).getTime();
+                valB = new Date(b.created_at).getTime();
+            }
+
+            if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+            if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+            return 0;
+        });
 
     const totalPages = Math.ceil(filteredSubmissions.length / itemsPerPage);
     const paginatedSubmissions = filteredSubmissions.slice(
@@ -255,16 +322,28 @@ export const AdminDashboard: React.FC = () => {
                     {/* Charts Section */}
                     {submissions.length > 0 && (
                         <div className="chart-grid">
+                            <div className="chart-card col-span-full">
+                                <h3 className="chart-title">Submission Timeline</h3>
+                                <div className="chart-wrapper h-64">
+                                    <TimelineChart data={filteredSubmissions} />
+                                </div>
+                            </div>
                             <div className="chart-card">
                                 <h3 className="chart-title">Responses by Faculty</h3>
                                 <div className="chart-wrapper">
-                                    <FacultyBarChart data={submissions} />
+                                    <FacultyBarChart data={filteredSubmissions} />
                                 </div>
                             </div>
                             <div className="chart-card">
                                 <h3 className="chart-title">Career Intentions</h3>
                                 <div className="chart-wrapper">
-                                    <CareerIntentionsPieChart data={submissions} />
+                                    <CareerIntentionsPieChart data={filteredSubmissions} />
+                                </div>
+                            </div>
+                            <div className="chart-card col-span-full">
+                                <h3 className="chart-title">Average GPA by Faculty (Correlation)</h3>
+                                <div className="chart-wrapper h-72">
+                                    <CorrelationChart data={filteredSubmissions} />
                                 </div>
                             </div>
                         </div>
@@ -290,23 +369,77 @@ export const AdminDashboard: React.FC = () => {
                 </div>
             ) : (
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 flex flex-col">
-                    {/* Search Bar */}
+                    {/* Search and Filter Bar */}
                     <div className="search-toolbar">
+                        {/* Search Input */}
                         <div className="search-container">
                             <Search className="search-icon" />
                             <input
                                 type="text"
-                                placeholder="Search by Name or Faculty..."
+                                placeholder="Search Name or Department..."
                                 className="search-input"
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
-                                    setCurrentPage(1); // Reset to first page on search
+                                    setCurrentPage(1);
                                 }}
                             />
                         </div>
-                        <div className="search-results-text">
-                            Showing {paginatedSubmissions.length} of {filteredSubmissions.length} results
+                        
+                        {/* Filters */}
+                        <div className="filter-controls">
+                            {/* Date Group */}
+                            <div className="date-filter-group">
+                                <span className="filter-label">From</span>
+                                <input 
+                                    type="date" 
+                                    className="date-input"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                />
+                                <div className="filter-divider"></div>
+                                <span className="filter-label">To</span>
+                                <input 
+                                    type="date" 
+                                    className="date-input"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                />
+                            </div>
+
+                            {/* Faculty Dropdown */}
+                            <select 
+                                className="select filter-select"
+                                value={facultyFilter}
+                                onChange={(e) => {
+                                    setFacultyFilter(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            >
+                                <option value="">All Faculties</option>
+                                {uniqueFaculties.map(fac => (
+                                    <option key={fac} value={fac}>{fac}</option>
+                                ))}
+                            </select>
+                            
+                            {/* Clear Button */}
+                            {(startDate || endDate || facultyFilter || searchTerm) && (
+                                <button 
+                                    onClick={() => {
+                                        setStartDate('');
+                                        setEndDate('');
+                                        setFacultyFilter('');
+                                        setSearchTerm('');
+                                    }}
+                                    className="btn-clear"
+                                >
+                                    Clear All
+                                </button>
+                            )}
+
+                            <div className="pagination-stat">
+                                {paginatedSubmissions.length} of {filteredSubmissions.length}
+                            </div>
                         </div>
                     </div>
 
@@ -314,18 +447,51 @@ export const AdminDashboard: React.FC = () => {
                         <table className="table">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Name</th>
+                                    <th className="w-12 text-center">Fav</th>
+                                    <th 
+                                        className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={() => handleSort('date')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Date <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                                        </div>
+                                    </th>
+                                    <th 
+                                        className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={() => handleSort('name')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Name <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                                        </div>
+                                    </th>
                                     <th>Faculty</th>
                                     <th>Dept</th>
                                     <th>Program</th>
-                                    <th>GPA</th>
-                                    <th>Actions</th>
+                                    <th 
+                                        className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={() => handleSort('gpa')}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            GPA <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                                        </div>
+                                    </th>
+                                    <th className="text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginatedSubmissions.map((sub) => (
-                                    <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
+                                {paginatedSubmissions.map((sub) => {
+                                    const isFlagged = flaggedIds.includes(sub.id);
+                                    return (
+                                    <tr key={sub.id} className={`table-row-hover ${isFlagged ? 'row-flagged' : ''}`}>
+                                        <td className="text-center">
+                                            <button 
+                                                onClick={() => toggleFlag(sub.id)}
+                                                className={`btn-flag ${isFlagged ? 'active' : ''}`}
+                                                title={isFlagged ? "Unflag" : "Flag this submission"}
+                                            >
+                                                <Star className="icon-sm" fill={isFlagged ? "currentColor" : "none"} />
+                                            </button>
+                                        </td>
                                         <td className="font-medium text-gray-600">
                                             {new Date(sub.created_at).toLocaleDateString()}
                                         </td>
@@ -345,7 +511,7 @@ export const AdminDashboard: React.FC = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <div className="action-buttons">
+                                            <div className="action-buttons justify-end">
                                                 <button
                                                     onClick={() => setSelectedSubmission(sub)}
                                                     className="btn-icon btn-view"
@@ -363,7 +529,8 @@ export const AdminDashboard: React.FC = () => {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                    );
+                                })}
                                 {paginatedSubmissions.length === 0 && (
                                     <tr>
                                         <td colSpan={7} className="text-center py-8 text-gray-500">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, User, BookOpen, Award, Target, Lightbulb, Search, AlertCircle, Printer } from 'lucide-react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import type { QuestionnaireData } from '../types';
 
 interface ResponseDetailModalProps {
@@ -25,12 +26,9 @@ const TabButton: React.FC<TabButtonProps> = ({ id, label, icon: Icon, isActive, 
             e.stopPropagation();
             onClick(id);
         }}
-        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors focus:outline-none ${isActive
-            ? 'border-blue-600 text-blue-600 bg-blue-50/50'
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-            }`}
+        className={`tab-btn ${isActive ? 'active' : ''}`}
     >
-        <Icon className="w-4 h-4" />
+        <Icon className="icon-sm" />
         {label}
     </button>
 );
@@ -45,7 +43,7 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
         }
     }, [isOpen]);
 
-    if (!isOpen) return null;
+    if (!isOpen || !data) return null;
 
     const handlePrint = () => {
         window.print();
@@ -66,35 +64,32 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
     );
 
     return (
-        <div className="modal-overlay print:bg-white print:p-0 print:static print:block">
-            <div className="modal-content print:shadow-none print:border-none print:max-w-none print:w-full print:h-auto print:overflow-visible">
+        <div className="modal-overlay">
+            <div className="modal-content">
                 {/* Header */}
-                <div
-                    className="modal-header no-print pb-0 border-b-0 flex-col items-start gap-4"
-                    style={{ alignItems: 'flex-start', flexDirection: 'column' }}
-                >
-                    <div className="flex justify-between items-start w-full">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-800">Submission Details</h2>
-                            <p className="text-sm text-gray-500">Submitted on {new Date(submissionDate).toLocaleString()}</p>
+                <div className="modal-header no-print">
+                    <div className="modal-header-top">
+                        <div className="modal-title-group">
+                            <h2>Submission Details</h2>
+                            <p>Submitted on {new Date(submissionDate).toLocaleString()}</p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="modal-header-actions">
                             <button
                                 type="button"
                                 onClick={handlePrint}
-                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                                className="btn-icon btn-print"
                                 title="Print Submission"
                             >
-                                <Printer className="w-5 h-5" />
+                                <Printer className="icon-sm" />
                             </button>
-                            <button onClick={onClose} className="modal-close-btn" type="button">
-                                <X className="w-5 h-5" />
+                            <button onClick={onClose} className="btn-icon btn-close" type="button">
+                                <X className="icon-sm" />
                             </button>
                         </div>
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex gap-1 border-b border-gray-200 w-full overflow-x-auto">
+                    <div className="modal-tabs">
                         <TabButton id="profile" label="Profile & Family" icon={User} isActive={activeTab === 'profile'} onClick={setActiveTab} />
                         <TabButton id="skills" label="Skills & Experience" icon={Award} isActive={activeTab === 'skills'} onClick={setActiveTab} />
                         <TabButton id="career" label="Career Plan" icon={Target} isActive={activeTab === 'career'} onClick={setActiveTab} />
@@ -111,33 +106,33 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                 </div>
 
                 {/* Content */}
-                <div className="modal-body custom-scrollbar print:p-8 print:overflow-visible">
+                <div className="modal-body custom-scrollbar">
 
                     {/* Top Summary Card */}
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100 mb-8 no-print">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div>
-                                <h3 className="text-lg font-bold text-gray-900">{data.name}</h3>
-                                <div className="text-sm text-gray-600 mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                    <div className="modal-summary-card no-print">
+                        <div className="modal-summary-content">
+                            <div className="modal-summary-info">
+                                <h3>{data.name}</h3>
+                                <div className="modal-summary-details">
                                     <span>{data.faculty}</span>
-                                    <span>•</span>
+                                    <span className="dot">•</span>
                                     <span>{data.department}</span>
-                                    <span>•</span>
+                                    <span className="dot">•</span>
                                     <span>Year {data.currentYear}</span>
                                 </div>
                             </div>
-                            <div className="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-100">
-                                <span className="text-xs text-gray-500 uppercase font-bold">Current GPA</span>
-                                <div className={`text-2xl font-bold ${parseFloat(data.gpa) >= 4.0 ? 'text-green-600' : parseFloat(data.gpa) >= 3.0 ? 'text-blue-600' : parseFloat(data.gpa) >= 2.0 ? 'text-orange-600' : 'text-gray-600'}`}>
+                            <div className="modal-gpa-box">
+                                <span className="modal-gpa-label">Current GPA</span>
+                                <div className={`modal-gpa-value ${parseFloat(data.gpa) >= 4.0 ? 'high' : parseFloat(data.gpa) >= 3.0 ? 'mid' : parseFloat(data.gpa) >= 2.0 ? 'low' : 'fail'}`}>
                                     {data.gpa}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="space-y-8">
+                    <div className="modal-sections-wrapper">
                         {/* TAB 1: Profile & Family */}
-                        <div className={`${activeTab === 'profile' ? 'block' : 'hidden'} print:block space-y-8`}>
+                        <div className={`modal-tab-content ${activeTab === 'profile' ? 'active' : ''}`}>
                             {/* Section 1: Academic & Personal */}
                             <div className="break-inside-avoid">
                                 <SectionHeader icon={User} title="Academic Information" />
@@ -164,39 +159,43 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                         </div>
 
                         {/* TAB 2: Skills & Experience */}
-                        <div className={`${activeTab === 'skills' ? 'block' : 'hidden'} print:block space-y-8`}>
+                        <div className={`modal-tab-content ${activeTab === 'skills' ? 'active' : ''}`}>
                             {/* Section 3: Skills & Competencies */}
                             <div className="break-inside-avoid">
                                 <SectionHeader icon={Award} title="Skills & Competencies" />
-                                <div className="mt-4 grid md:grid-cols-2 gap-6">
-                                    <div className="bg-gray-50 p-5 rounded-lg border border-gray-100 print:bg-white print:border-gray-200">
-                                        <h4 className="font-semibold text-gray-800 mb-4 text-sm uppercase tracking-wide border-b border-gray-200 pb-2">Proficiency Ratings (1-5)</h4>
-                                        <div className="space-y-3">
-                                            {[
-                                                { l: 'Technical', v: data.skills.technical },
-                                                { l: 'Problem Solving', v: data.skills.problemSolving },
-                                                { l: 'Communication', v: data.skills.communication },
-                                                { l: 'Teamwork', v: data.skills.teamwork },
-                                                { l: 'Digital Literacy', v: data.skills.digitalLiteracy },
-                                                { l: 'Project Mgmt', v: data.skills.projectManagement },
-                                                { l: 'Leadership', v: data.skills.leadership },
-                                            ].map((item, i) => (
-                                                <div key={i} className="flex justify-between items-center">
-                                                    <span className="text-sm text-gray-600">{item.l}</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                            <div
-                                                                className="h-full bg-blue-500 rounded-full"
-                                                                style={{ width: `${(parseInt(item.v) / 5) * 100}%` }}
-                                                            ></div>
-                                                        </div>
-                                                        <span className="font-bold text-sm w-4 text-right">{item.v}</span>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                <div className="modal-radar-grid mt-4">
+                                    <div className="radar-container bg-gray-50">
+                                        <h4 className="font-semibold text-gray-800 mb-2 text-sm uppercase tracking-wide border-b border-gray-200 pb-2">Proficiency Radar</h4>
+                                        <div className="radar-chart-wrapper flex justify-center">
+                                            <RadarChart width={400} height={320} cx="50%" cy="50%" outerRadius="70%" data={[
+                                                { subject: 'Technical', A: parseInt(data.skills?.technical || '0'), fullMark: 5 },
+                                                { subject: 'Problem Solving', A: parseInt(data.skills?.problemSolving || '0'), fullMark: 5 },
+                                                { subject: 'Communication', A: parseInt(data.skills?.communication || '0'), fullMark: 5 },
+                                                { subject: 'Teamwork', A: parseInt(data.skills?.teamwork || '0'), fullMark: 5 },
+                                                { subject: 'Digital Lit.', A: parseInt(data.skills?.digitalLiteracy || '0'), fullMark: 5 },
+                                                { subject: 'Project Mgmt', A: parseInt(data.skills?.projectManagement || '0'), fullMark: 5 },
+                                                { subject: 'Leadership', A: parseInt(data.skills?.leadership || '0'), fullMark: 5 },
+                                            ]}>
+                                                <PolarGrid stroke="#e5e7eb" />
+                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#4b5563', fontSize: 11 }} />
+                                                <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+                                                <Radar name="Skills" dataKey="A" stroke="#3b82f6" fill="#60a5fa" fillOpacity={0.5} />
+                                            </RadarChart>
                                         </div>
                                     </div>
-                                    <div className="space-y-4">
+                                    <div className="radar-stats-list">
+                                        <div className="mb-4 bg-white p-4 rounded-lg border border-gray-100">
+                                            <h4 className="font-semibold text-gray-800 mb-3 text-xs uppercase tracking-wide border-b border-gray-100 pb-2">Raw Scores (1-5)</h4>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Field label="Technical" value={data.skills?.technical || '0'} />
+                                                <Field label="Problem Solving" value={data.skills?.problemSolving || '0'} />
+                                                <Field label="Communication" value={data.skills?.communication || '0'} />
+                                                <Field label="Teamwork" value={data.skills?.teamwork || '0'} />
+                                                <Field label="Digital Lit." value={data.skills?.digitalLiteracy || '0'} />
+                                                <Field label="Project Mgmt" value={data.skills?.projectManagement || '0'} />
+                                                <Field label="Leadership" value={data.skills?.leadership || '0'} />
+                                            </div>
+                                        </div>
                                         <Field label="Internships Completed" value={data.internships} />
                                         <Field label="Professional Certifications" value={data.certifications} />
                                         {data.certifications === 'Yes' && <Field label="Certification Details" value={data.certificationsList} fullWidth />}
@@ -212,17 +211,17 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                                     <div className="col-span-full mb-2">
                                         <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wide">Self-Assessment Ratings (1-5)</h4>
                                     </div>
-                                    <Field label="Skills Confidence" value={data.entrepreneurship.skills} />
-                                    <Field label="Opportunity ID" value={data.entrepreneurship.opportunities} />
-                                    <Field label="Resilience" value={data.entrepreneurship.challenges} />
-                                    <Field label="Resource Access" value={data.entrepreneurship.resources} />
-                                    <Field label="Risk Tolerance" value={data.entrepreneurship.risks} />
+                                    <Field label="Skills Confidence" value={data.entrepreneurship?.skills || 'N/A'} />
+                                    <Field label="Opportunity ID" value={data.entrepreneurship?.opportunities || 'N/A'} />
+                                    <Field label="Resilience" value={data.entrepreneurship?.challenges || 'N/A'} />
+                                    <Field label="Resource Access" value={data.entrepreneurship?.resources || 'N/A'} />
+                                    <Field label="Risk Tolerance" value={data.entrepreneurship?.risks || 'N/A'} />
                                 </div>
                             </div>
                         </div>
 
                         {/* TAB 3: Career Plan */}
-                        <div className={`${activeTab === 'career' ? 'block' : 'hidden'} print:block space-y-8`}>
+                        <div className={`modal-tab-content ${activeTab === 'career' ? 'active' : ''}`}>
                             {/* Section 4: Career Intentions */}
                             <div className="break-inside-avoid">
                                 <SectionHeader icon={Target} title="Career Intentions" />
@@ -236,7 +235,7 @@ export const ResponseDetailModal: React.FC<ResponseDetailModalProps> = ({ isOpen
                             </div>
 
                             {/* Section 6: Job Search & Enablers */}
-                            <div className="break-inside-avoid grid md:grid-cols-2 gap-8">
+                            <div className="break-inside-avoid modal-jobs-grid mt-4">
                                 <div>
                                     <SectionHeader icon={Search} title="Job Search Readiness" />
                                     <div className="space-y-4 mt-4">

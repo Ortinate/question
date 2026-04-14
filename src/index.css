@@ -918,6 +918,163 @@ textarea {
   color: #6b7280;
 }
 
+/* Custom Filter Controls */
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .filter-controls {
+    width: auto;
+  }
+}
+
+.date-filter-group {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 0.375rem 0.75rem;
+  transition: border-color 0.2s;
+}
+
+.date-filter-group:hover, .date-filter-group:focus-within {
+  border-color: #94a3b8;
+}
+
+.filter-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 0.5rem;
+}
+
+.date-input {
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  color: #334155;
+  background-color: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+.filter-divider {
+  width: 1px;
+  height: 1.25rem;
+  background-color: #e2e8f0;
+  margin: 0 0.75rem;
+}
+
+.filter-select {
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  font-size: 0.875rem;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  min-width: 160px;
+}
+
+.filter-select:hover, .filter-select:focus {
+  border-color: #94a3b8;
+}
+
+.btn-clear {
+  background: transparent;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #3b82f6;
+  cursor: pointer;
+  padding: 0.375rem 0.5rem;
+  transition: color 0.2s;
+}
+
+.btn-clear:hover {
+  color: #1e3a8a;
+  text-decoration: underline;
+}
+
+.pagination-stat {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  background-color: #f8fafc;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  margin-left: auto;
+}
+
+@media (max-width: 991px) {
+  .pagination-stat {
+    margin-left: 0;
+  }
+}
+
+/* Enhanced Table Row Actions */
+.table-row-hover {
+  transition: background-color 0.2s, border-color 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.table-row-hover:hover {
+  background-color: #f1f5f9;
+}
+
+.row-flagged {
+  background-color: #fffbeb !important; /* amber-50 */
+  border-left: 3px solid #fbbf24;
+}
+
+.row-flagged:hover {
+  background-color: #fef3c7 !important; /* amber-100 */
+}
+
+.btn-flag {
+  background: transparent;
+  border: none;
+  padding: 0.375rem;
+  border-radius: 9999px;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-flag:hover {
+  color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+.btn-flag.active {
+  color: #f59e0b; /* amber-500 */
+}
+
+.btn-flag.active:hover {
+  color: #d97706; /* amber-600 */
+  background-color: #fef3c7; /* amber-100 */
+}
+
 /* Action Buttons */
 .action-buttons {
   display: flex;
@@ -938,13 +1095,13 @@ textarea {
 }
 
 .btn-view {
-  color: var(--primary);
+  color: #3b82f6;
   font-weight: 500;
   font-size: 0.875rem;
 }
 
 .btn-view:hover {
-  color: var(--primary-light);
+  color: #1e40af;
   background-color: #eff6ff;
 }
 
@@ -953,8 +1110,12 @@ textarea {
 }
 
 .btn-delete:hover {
-  color: #dc2626;
+  color: #b91c1c;
   background-color: #fef2f2;
+}
+
+.justify-end {
+  justify-content: flex-end;
 }
 
 /* Pagination */
@@ -1021,13 +1182,118 @@ textarea {
   overflow: hidden;
 }
 
+/* Enhanced Modal UI */
 .modal-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 0;
+  border-bottom: none;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header-top {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1.5rem 1.5rem 0rem;
+}
+
+.modal-title-group h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.modal-title-group p {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.modal-header-actions {
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.btn-print {
+  color: #6b7280;
+}
+
+.btn-print:hover {
+  color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.btn-close {
+  color: #6b7280;
+}
+
+.btn-close:hover {
+  color: #1f2937;
+  background-color: #f3f4f6;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem 0;
+  margin-top: 0.5rem;
+}
+
+/* Hide scrollbar for tabs */
+.modal-tabs::-webkit-scrollbar {
+  display: none;
+}
+.modal-tabs {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  color: #374151;
   background-color: #f9fafb;
+}
+
+.tab-btn.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  background-color: #eff6ff;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
 }
 
 .modal-body {
@@ -1035,8 +1301,157 @@ textarea {
   overflow-y: auto;
 }
 
+.modal-summary-card {
+  background: linear-gradient(to right, #eff6ff, #e0e7ff);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 2rem;
+}
+
+.modal-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .modal-summary-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.modal-summary-info h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.modal-summary-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.modal-summary-details .dot {
+  color: #9ca3af;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.modal-gpa-box {
+  background-color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #bfdbfe;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.modal-gpa-label {
+  font-size: 0.6875rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 0.125rem;
+}
+
+.modal-gpa-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.modal-gpa-value.high { color: #16a34a; }
+.modal-gpa-value.mid { color: #2563eb; }
+.modal-gpa-value.low { color: #ea580c; }
+.modal-gpa-value.fail { color: #4b5563; }
+
+.modal-tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-tab-content.active {
+  display: block;
+}
+
+.modal-tab-content > * + * {
+  margin-top: 2rem;
+}
+
+.modal-radar-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .modal-radar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.radar-container {
+  background-color: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.radar-container h4 {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.radar-chart-wrapper {
+  height: auto;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.radar-chart-wrapper svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.radar-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-jobs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .modal-jobs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .modal-footer {
-  padding: 1rem;
+  padding: 1rem 1.5rem;
   border-top: 1px solid #f3f4f6;
   background-color: #f9fafb;
   text-align: right;
@@ -1134,44 +1549,200 @@ textarea {
     size: A4;
   }
 
-  body {
-    background: white;
+  /* Disable all animations and transitions. Chrome print snapshots occur at t=0, so fade-in animations get permanently stuck at opacity: 0! */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
   }
 
-  /* Hide everything by default when printing */
-  body>*:not(.modal-overlay) {
+  /* CRITICAL: Browsers will aggressively crop flex containers to 1 page.
+     We MUST transform global app wrappers to standard block renders */
+  html, body, #root, #root > div, main, .dashboard-container {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    background: white !important;
+  }
+
+  /* Force all tabs to instantly render out regardless of UI state */
+  .modal-tab-content {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  /* Force the page itself to break naturally */
+  .modal-tab-content > * {
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  /* When printing the modal, hide the main dashboard background elements by default */
+  .app-header,
+  .app-footer,
+  .dashboard-header,
+  .dashboard-stats-grid,
+  .chart-grid,
+  .search-toolbar,
+  .pagination-container {
+    display: none !important;
+  }
+
+  /* Make sure table is hidden if modal is open, or we can just hide it completely on print for now.
+     Usually, we don't print the huge data table. */
+  .dashboard-container > .bg-white {
     display: none !important;
   }
 
   /* Ensure modal overlay is visible and takes up full page */
   .modal-overlay {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    z-index: 9999 !important;
-    background: white !important;
+    position: static !important;
     display: block !important;
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
     padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
   }
 
   .modal-content {
+    position: static !important;
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important; /* CRUCIAL */
+    overflow: visible !important; /* CRUCIAL */
     box-shadow: none !important;
     border: none !important;
-    width: 100% !important;
-    max-width: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .modal-body {
-    overflow: visible !important;
+    position: static !important;
+    display: block !important;
+    overflow: visible !important; 
     height: auto !important;
+    max-height: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ========================================================= */
+  /* PROFESSIONAL CORPORATE PRINT TYPOGRAPHY & LAYOUT          */
+  /* ========================================================= */
+  
+  body {
+    color: #1f2937 !important;
+    font-size: 10pt !important;
+  }
+
+  /* Executive Header */
+  .print-only.p-8.border-b.border-gray-200 {
+    padding: 0 2rem 1.5rem 2rem !important;
+    margin-bottom: 2rem !important;
+    border-bottom: 2px solid var(--primary) !important;
+  }
+
+  .print-only h1 {
+    color: var(--primary) !important;
+    font-size: 20pt !important;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+
+  .print-only .text-sm {
+    font-size: 11pt !important;
+  }
+
+  /* Section Titles */
+  .section-header-row {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+    padding: 0 0 0.25rem 0 !important;
+    margin: 1.5rem 0 1rem 0 !important;
+    box-shadow: none !important;
+  }
+
+  .section-header-row h3 {
+    font-size: 12pt !important;
+    color: var(--primary-dark) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .section-header-row svg {
+    color: var(--primary) !important;
+  }
+
+  /* Data Fields */
+  .modal-label {
+    font-size: 8pt !important;
+    color: #64748b !important;
+    margin-bottom: 0.125rem !important;
+  }
+
+  .modal-value {
+    font-size: 10pt !important;
+    color: #000 !important;
+    font-weight: 500 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Compressing margins to prevent wasted space */
+  .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1.5rem !important; /* Reduced from tailwind definition */
+  }
+
+  /* Grid Alignments */
+  .modal-section-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem 2rem !important;
+  }
+
+  .modal-section-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* Prevent blocks from breaking across pages awkwardly */
+  .break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .bg-gray-50 {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  /* Radar Chart Print Rules */
+  .radar-chart-wrapper {
+    height: 320px !important;
+    max-width: 450px !important;
+    margin: 0 auto;
+  }
+
+  /* Extra specificity for 2-column job search row */
+  .grid.md\:grid-cols-2.gap-8 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 3rem !important;
   }
 
   /* Hide non-printable elements */
   .no-print,
   .admin-login-background,
-  .dashboard-container,
   button {
     display: none !important;
   }

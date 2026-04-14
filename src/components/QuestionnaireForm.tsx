@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { initialData } from '../types';
 import type { QuestionnaireData } from '../types';
 import { supabase } from '../lib/supabaseClient';
@@ -12,8 +12,14 @@ import { Section7 } from './Section7';
 import { ChevronRight, ChevronLeft, CheckCircle, Loader2 } from 'lucide-react';
 
 export const QuestionnaireForm: React.FC = () => {
-    const [data, setData] = useState<QuestionnaireData>(initialData);
-    const [currentSection, setCurrentSection] = useState(1);
+    const [data, setData] = useState<QuestionnaireData>(() => {
+        const saved = localStorage.getItem('questionnaire_draft');
+        return saved ? JSON.parse(saved) : initialData;
+    });
+    const [currentSection, setCurrentSection] = useState(() => {
+        const savedStr = localStorage.getItem('questionnaire_section');
+        return savedStr ? parseInt(savedStr, 10) : 1;
+    });
     const [submitted, setSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,6 +36,14 @@ export const QuestionnaireForm: React.FC = () => {
             setErrors(newErrors);
         }
     };
+
+    // Auto-save form progress
+    useEffect(() => {
+        if (!submitted) {
+            localStorage.setItem('questionnaire_draft', JSON.stringify(data));
+            localStorage.setItem('questionnaire_section', currentSection.toString());
+        }
+    }, [data, currentSection, submitted]);
 
     const validateSection = (section: number): boolean => {
         const newErrors: Record<string, string> = {};
@@ -151,17 +165,19 @@ export const QuestionnaireForm: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            // Duplicate Submission Prevention (by Name & Department)
-            if (data.name && data.department) {
+            // Duplicate Submission Prevention (Compound Heuristic: Name + Age + Gender + Department)
+            if (data.name && data.department && data.age && data.gender) {
                 const { data: existing } = await supabase
                     .from('questionnaire_responses')
                     .select('id')
                     .filter('data->>name', 'eq', data.name)
+                    .filter('data->>age', 'eq', data.age)
+                    .filter('data->>gender', 'eq', data.gender)
                     .filter('data->>department', 'eq', data.department)
                     .limit(1);
 
                 if (existing && existing.length > 0) {
-                    alert(`A submission for "${data.name}" in "${data.department}" already exists. Please avoid submitting duplicate responses.`);
+                    alert(`A submission for a student named "${data.name}" (${data.age}, ${data.gender}) in "${data.department}" already exists. If this is a mistake, please inform an administrator.`);
                     setIsSubmitting(false);
                     return;
                 }
@@ -172,6 +188,10 @@ export const QuestionnaireForm: React.FC = () => {
                 .insert([{ data: data }]);
 
             if (error) throw error;
+
+            // Clear draft from localStorage on successful submit
+            localStorage.removeItem('questionnaire_draft');
+            localStorage.removeItem('questionnaire_section');
 
             setSubmitted(true);
             window.scrollTo(0, 0);
